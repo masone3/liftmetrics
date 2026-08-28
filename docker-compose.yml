@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: liftmetrics-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: liftmetrics
+      POSTGRES_PASSWORD: liftmetrics_dev_pw
+      POSTGRES_DB: liftmetrics
+    ports:
+      - "5432:5432"
+    volumes:
+      - liftmetrics_pgdata:/var/lib/postgresql/data
+
+volumes:
+  liftmetrics_pgdata:

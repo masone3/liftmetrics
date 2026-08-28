@@ -4,6 +4,7 @@ import "dotenv/config";
 
 import healthRoutes from "./routes/health.routes.js";
 import userRoutes from "./routes/users.routes.js";
+import workoutsRoutes from "./routes/workouts.routes.js";
 import { notFound } from "./middleware/notFound.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/health", healthRoutes);
 app.use("/users", userRoutes);
+app.use("/workouts", workoutsRoutes);
 // Catch-all for unknown routes
 app.use(notFound);
 
