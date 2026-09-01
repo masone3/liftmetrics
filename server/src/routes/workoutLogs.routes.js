@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { z } from "zod";
 import prisma from "../lib/prisma.js";
+import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
+
+router.use(requireAuth); // All routes below require authentication
 
 const setEntrySchema = z.object({
   exerciseId: z.string().uuid(),
@@ -12,9 +15,8 @@ const setEntrySchema = z.object({
 });
 
 const createLogSchema = z.object({
-  userId: z.string().uuid(),
   workoutId: z.string().uuid(),
-  performedAt: z.string().datetime().optional(), // ISO string; defaults to now if omitted
+  performedAt: z.string().datetime().optional(),
   setEntries: z.array(setEntrySchema).min(1),
 });
 
@@ -23,9 +25,19 @@ router.post("/", async (req, res, next) => {
   try {
     const data = createLogSchema.parse(req.body);
 
+    const workout = await prisma.workout.findUnique({
+      where: { id: data.workoutId },
+    });
+    if (!workout) {
+      return res.status(404).json({ error: "Workout not found" });
+    }
+    if (workout.userId !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized to log against this workout" });
+    }
+
     const log = await prisma.workoutLog.create({
       data: {
-        userId: data.userId,
+        userId: req.user.id,
         workoutId: data.workoutId,
         ...(data.performedAt && { performedAt: new Date(data.performedAt) }),
         setEntries: {
@@ -65,23 +77,25 @@ router.get("/:id", async (req, res, next) => {
       return res.status(404).json({ error: "Workout log not found" });
     }
 
+    // ownership check
+    if (log.userId !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized to view this log" });
+    }
+
     res.status(200).json(log);
   } catch (err) {
     next(err);
   }
 });
 
-// GET /workout-logs?userId=...&from=...&to=... — session history, optionally date-filtered
+// GET /workout-logs?from=...&to=... — session history, optionally date-filtered
 router.get("/", async (req, res, next) => {
   try {
-    const { userId, from, to } = req.query;
-    if (!userId) {
-      return res.status(400).json({ error: "userId query param is required" });
-    }
+    const { from, to } = req.query;
 
     const logs = await prisma.workoutLog.findMany({
       where: {
-        userId,
+        userId: req.user.id,
         ...(from || to
           ? {
               performedAt: {
