@@ -1,8 +1,8 @@
 function App() {
   return (
-    <div>
+    <div style={{ padding: "2rem" }}>
       <h1>Liftmetrics</h1>
-      <p>Workout planner — coming together, one day at a time.</p>
+      <p>Frontend scaffold ready - routing comes next</p>
     </div>
   );
 }
