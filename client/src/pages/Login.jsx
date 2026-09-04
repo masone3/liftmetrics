@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useAuth } from "../context/useAuth.js";
 import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
@@ -27,10 +29,10 @@ function Login() {
         return;
       }
 
-      // Day 15 will replace this with proper auth context handling
-      localStorage.setItem("token", body.token);
+      login(body.token, body.user); // replaces the old localStorage.setItem line
       navigate("/dashboard");
     } catch (err) {
+      console.error("Registration failed:", err);
       setServerError("Something went wrong. Please try again.");
     }
   };
