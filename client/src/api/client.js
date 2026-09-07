@@ -17,6 +17,11 @@ async function request(path, options = {}) {
   const body = await res.json().catch(() => null);
 
   if (!res.ok) {
+    // NEW: broadcast that the session is no longer valid
+    if (res.status === 401) {
+      window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+    }
+
     const error = new Error(body?.error || "Request failed");
     error.status = res.status;
     error.body = body;

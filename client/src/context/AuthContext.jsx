@@ -35,6 +35,15 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // NEW: listen for the API client's "unauthorized" signal
+  useEffect(() => {
+    function handleUnauthorized() {
+      logout();
+    }
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
+  }, []);
+
   const value = {
     token,
     user,
