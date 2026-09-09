@@ -33,7 +33,12 @@ function WorkoutForm({ onCreated }) {
       onCreated();
     } catch (err) {
       console.error("Failed to create workout:", err);
-      setServerError(err.body?.error || "Failed to create workout");
+
+      const message = Array.isArray(err.body?.error)
+        ? err.body.error.map((issue) => issue.message).join(", ")
+        : err.body?.error || "Failed to create workout";
+
+      setServerError(message);
     }
   };
 

@@ -18,6 +18,8 @@ server/dist/
 # Prisma
 server/prisma/migrations/dev.db
 *.db
+.claude/
+.agents/
 
 # Logs
 logs/

@@ -13,7 +13,6 @@ const exerciseSchema = z.object({
 });
 
 const createWorkoutSchema = z.object({
-  userId: z.string().min(1),
   name: z.string().min(1),
   description: z.string().optional(),
   exercises: z.array(exerciseSchema).optional().default([]),
