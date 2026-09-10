@@ -3,12 +3,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useFetch } from "../hooks/useFetch.js";
 import { workoutsApi } from "../api/workouts.js";
+import LogSessionForm from "../components/LogSessionForm.jsx";
 import Skeleton from "../components/Skeleton.jsx";
 
 function WorkoutDetail() {
   const { id } = useParams();
   const { data: workout, loading, error, refetch } = useFetch(() => workoutsApi.getById(id), [id]);
   const [showAddExercise, setShowAddExercise] = useState(false);
+  const [showLogSession, setShowLogSession] = useState(false);
 
   if (loading) {
     return (
@@ -45,6 +47,20 @@ function WorkoutDetail() {
       <Link to="/workouts">← Back to workouts</Link>
       <h1>{workout.name}</h1>
       {workout.description && <p style={{ color: "#666" }}>{workout.description}</p>}
+
+      {workout.exercises.length > 0 && (
+        <div style={{ marginTop: "1rem" }}>
+          <button onClick={() => setShowLogSession((prev) => !prev)}>
+            {showLogSession ? "Cancel" : "Log a Session"}
+          </button>
+          {showLogSession && (
+            <LogSessionForm
+              workout={workout}
+              onLogged={() => setShowLogSession(false)}
+            />
+          )}
+        </div>
+      )}
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5rem" }}>
         <h2>Exercises</h2>
