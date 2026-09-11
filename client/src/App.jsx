@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Workouts from "./pages/Workouts.jsx";
 import WorkoutDetail from "./pages/WorkoutDetail.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import History from "./pages/History.jsx";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="workouts" element={<Workouts />} />
               <Route path="workouts/:id" element={<WorkoutDetail />} />
+              <Route path="history" element={<History />} />
             </Route>
           </Route>
         </Routes>

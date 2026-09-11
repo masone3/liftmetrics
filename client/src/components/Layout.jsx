@@ -18,6 +18,7 @@ function Layout() {
           <>
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/workouts">Workouts</Link>
+            <Link to="/history">History</Link>
             <span>Hi, {user?.name}</span>
             <button onClick={handleLogout}>Log out</button>
           </>
