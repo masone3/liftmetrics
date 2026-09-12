@@ -2,19 +2,31 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { useFetch } from "../hooks/useFetch.js";
 import { workoutLogsApi } from "../api/workoutLogs.js";
+import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import Skeleton from "../components/Skeleton.jsx";
 
 function History() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [confirmDeleteLog, setConfirmDeleteLog] = useState(null);
 
-  const { data: logs, loading, error } = useFetch(
+  const { data: logs, loading, error, refetch } = useFetch(
     () => workoutLogsApi.list({
       ...(from && { from: dayjs(from).startOf("day").toISOString() }),
       ...(to && { to: dayjs(to).endOf("day").toISOString() }),
     }),
     [from, to]
   );
+
+  const handleDeleteLog = async (logId) => {
+    try {
+      await workoutLogsApi.delete(logId);
+      setConfirmDeleteLog(null);
+      refetch();
+    } catch (err) {
+      console.error("Failed to delete log:", err);
+    }
+  };
 
   return (
     <div>
@@ -62,9 +74,12 @@ function History() {
               key={log.id}
               style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "1rem", marginBottom: "0.75rem" }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <strong>{log.workout.name}</strong>
-                <span style={{ color: "#666" }}>{dayjs(log.performedAt).format("MMM D, YYYY")}</span>
+                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                  <span style={{ color: "#666" }}>{dayjs(log.performedAt).format("MMM D, YYYY")}</span>
+                  <button onClick={() => setConfirmDeleteLog(log.id)}>Delete</button>
+                </div>
               </div>
               <ul style={{ marginTop: "0.5rem", paddingLeft: "1.25rem" }}>
                 {log.setEntries.map((set) => (
@@ -76,6 +91,14 @@ function History() {
             </li>
           ))}
         </ul>
+      )}
+
+      {confirmDeleteLog && (
+        <ConfirmDialog
+          message="Delete this logged session? This cannot be undone."
+          onConfirm={() => handleDeleteLog(confirmDeleteLog)}
+          onCancel={() => setConfirmDeleteLog(null)}
+        />
       )}
     </div>
   );

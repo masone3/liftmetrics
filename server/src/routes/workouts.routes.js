@@ -18,6 +18,11 @@ const createWorkoutSchema = z.object({
   exercises: z.array(exerciseSchema).optional().default([]),
 });
 
+const updateWorkoutSchema = z.object({
+  name: z.string().min(1).optional(),
+  description: z.string().optional(),
+});
+
 // POST /workouts — create a workout, optionally with exercises nested in
 router.post("/", async (req, res, next) => {
   try {
@@ -104,6 +109,101 @@ router.post("/:id/exercises", async (req, res, next) => {
     if (err.code === "P2003") {
       return res.status(400).json({ error: "workout not found" });
     }
+    next(err);
+  }
+});
+
+// PATCH /workouts/:id — update name/description
+router.patch("/:id", async (req, res, next) => {
+  try {
+    const data = updateWorkoutSchema.parse(req.body);
+
+    const existing = await prisma.workout.findUnique({ where: { id: req.params.id } });
+    if (!existing) {
+      return res.status(404).json({ error: "Workout not found" });
+    }
+    if (existing.userId !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized to edit this workout" });
+    }
+
+    const workout = await prisma.workout.update({
+      where: { id: req.params.id },
+      data,
+      include: { exercises: true },
+    });
+
+    res.status(200).json(workout);
+  } catch (err) {
+    if (err.name === "ZodError") {
+      return res.status(400).json({ error: err.issues });
+    }
+    next(err);
+  }
+});
+
+// DELETE /workouts/:id — delete a workout and its exercises
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const existing = await prisma.workout.findUnique({ where: { id: req.params.id } });
+    if (!existing) {
+      return res.status(404).json({ error: "Workout not found" });
+    }
+    if (existing.userId !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized to delete this workout" });
+    }
+
+    // Delete dependent rows first — Postgres won't let us delete a Workout
+    // while Exercises/WorkoutLogs still reference it via foreign key.
+    await prisma.setEntry.deleteMany({
+      where: { exercise: { workoutId: req.params.id } },
+    });
+    await prisma.workoutLog.deleteMany({ where: { workoutId: req.params.id } });
+    await prisma.exercise.deleteMany({ where: { workoutId: req.params.id } });
+    await prisma.workout.delete({ where: { id: req.params.id } });
+
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PATCH /workouts/:id/exercises/:exerciseId — edit an exercise
+router.patch("/:id/exercises/:exerciseId", async (req, res, next) => {
+  try {
+    const data = exerciseSchema.partial().parse(req.body);
+
+    const workout = await prisma.workout.findUnique({ where: { id: req.params.id } });
+    if (!workout || workout.userId !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    const exercise = await prisma.exercise.update({
+      where: { id: req.params.exerciseId },
+      data,
+    });
+
+    res.status(200).json(exercise);
+  } catch (err) {
+    if (err.name === "ZodError") {
+      return res.status(400).json({ error: err.issues });
+    }
+    next(err);
+  }
+});
+
+// DELETE /workouts/:id/exercises/:exerciseId
+router.delete("/:id/exercises/:exerciseId", async (req, res, next) => {
+  try {
+    const workout = await prisma.workout.findUnique({ where: { id: req.params.id } });
+    if (!workout || workout.userId !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+
+    await prisma.setEntry.deleteMany({ where: { exerciseId: req.params.exerciseId } });
+    await prisma.exercise.delete({ where: { id: req.params.exerciseId } });
+
+    res.status(204).send();
+  } catch (err) {
     next(err);
   }
 });

@@ -1,16 +1,39 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useFetch } from "../hooks/useFetch.js";
 import { workoutsApi } from "../api/workouts.js";
+import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import LogSessionForm from "../components/LogSessionForm.jsx";
 import Skeleton from "../components/Skeleton.jsx";
 
 function WorkoutDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: workout, loading, error, refetch } = useFetch(() => workoutsApi.getById(id), [id]);
   const [showAddExercise, setShowAddExercise] = useState(false);
   const [showLogSession, setShowLogSession] = useState(false);
+  const [confirmDeleteWorkout, setConfirmDeleteWorkout] = useState(false);
+  const [confirmDeleteExercise, setConfirmDeleteExercise] = useState(null);
+
+  const handleDeleteWorkout = async () => {
+    try {
+      await workoutsApi.delete(id);
+      navigate("/workouts");
+    } catch (err) {
+      console.error("Failed to delete workout:", err);
+    }
+  };
+
+  const handleDeleteExercise = async (exerciseId) => {
+    try {
+      await workoutsApi.deleteExercise(id, exerciseId);
+      setConfirmDeleteExercise(null);
+      refetch();
+    } catch (err) {
+      console.error("Failed to delete exercise:", err);
+    }
+  };
 
   if (loading) {
     return (
@@ -45,8 +68,23 @@ function WorkoutDetail() {
   return (
     <div>
       <Link to="/workouts">← Back to workouts</Link>
-      <h1>{workout.name}</h1>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1>{workout.name}</h1>
+        <button onClick={() => setConfirmDeleteWorkout(true)} style={{ color: "#d9534f" }}>
+          Delete Workout
+        </button>
+      </div>
+
       {workout.description && <p style={{ color: "#666" }}>{workout.description}</p>}
+
+      {confirmDeleteWorkout && (
+        <ConfirmDialog
+          message={`Delete "${workout.name}"? This will also delete all logged sessions for it.`}
+          onConfirm={handleDeleteWorkout}
+          onCancel={() => setConfirmDeleteWorkout(false)}
+        />
+      )}
 
       {workout.exercises.length > 0 && (
         <div style={{ marginTop: "1rem" }}>
@@ -89,13 +127,32 @@ function WorkoutDetail() {
             .map((exercise) => (
               <li
                 key={exercise.id}
-                style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "0.75rem", marginBottom: "0.5rem" }}
+                style={{
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  padding: "0.75rem",
+                  marginBottom: "0.5rem",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
               >
-                <strong>{exercise.name}</strong>
-                {exercise.targetMuscle && <span style={{ color: "#666" }}> — {exercise.targetMuscle}</span>}
+                <span>
+                  <strong>{exercise.name}</strong>
+                  {exercise.targetMuscle && <span style={{ color: "#666" }}> — {exercise.targetMuscle}</span>}
+                </span>
+                <button onClick={() => setConfirmDeleteExercise(exercise.id)}>Remove</button>
               </li>
             ))}
         </ul>
+      )}
+
+      {confirmDeleteExercise && (
+        <ConfirmDialog
+          message="Remove this exercise from the workout?"
+          onConfirm={() => handleDeleteExercise(confirmDeleteExercise)}
+          onCancel={() => setConfirmDeleteExercise(null)}
+        />
       )}
     </div>
   );

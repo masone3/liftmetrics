@@ -7,4 +7,5 @@ export const workoutLogsApi = {
   },
   getById: (id) => api.get(`/workout-logs/${id}`),
   create: (data) => api.post("/workout-logs", data),
+  delete: (id) => api.delete(`/workout-logs/${id}`),
 };

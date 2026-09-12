@@ -118,4 +118,24 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// DELETE /workout-logs/:id
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const log = await prisma.workoutLog.findUnique({ where: { id: req.params.id } });
+    if (!log) {
+      return res.status(404).json({ error: "Workout log not found" });
+    }
+    if (log.userId !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized to delete this log" });
+    }
+
+    await prisma.setEntry.deleteMany({ where: { workoutLogId: req.params.id } });
+    await prisma.workoutLog.delete({ where: { id: req.params.id } });
+
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

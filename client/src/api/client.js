@@ -14,6 +14,10 @@ async function request(path, options = {}) {
     headers,
   });
 
+  if (res.status === 204) {
+    return null;
+  }
+
   const body = await res.json().catch(() => null);
 
   if (!res.ok) {
