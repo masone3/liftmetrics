@@ -18,6 +18,10 @@ async function request(path, options = {}) {
     return null;
   }
 
+  if (res.status === 401) {
+    window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+  }
+
   const body = await res.json().catch(() => null);
 
   if (!res.ok) {

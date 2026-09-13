@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
+  const [sessionExpired, setSessionExpired] = useState(false); // NEW
 
   useEffect(() => {
     if (token) {
@@ -28,6 +29,7 @@ export function AuthProvider({ children }) {
   const login = (newToken, newUser) => {
     setToken(newToken);
     setUser(newUser);
+    setSessionExpired(false); // clear the flag on a fresh login
   };
 
   const logout = () => {
@@ -35,9 +37,9 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  // NEW: listen for the API client's "unauthorized" signal
   useEffect(() => {
     function handleUnauthorized() {
+      setSessionExpired(true); // mark that this logout was involuntary
       logout();
     }
     window.addEventListener("auth:unauthorized", handleUnauthorized);
@@ -48,6 +50,7 @@ export function AuthProvider({ children }) {
     token,
     user,
     isAuthenticated: !!token,
+    sessionExpired, // NEW
     login,
     logout,
   };

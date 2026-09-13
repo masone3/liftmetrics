@@ -4,7 +4,7 @@ import { useAuth } from "../context/useAuth.js";
 import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
-  const { login } = useAuth();
+  const { login, sessionExpired } = useAuth();
   const {
     register,
     handleSubmit,
@@ -40,6 +40,12 @@ function Login() {
   return (
     <div style={{ maxWidth: "400px" }}>
       <h1>Log In</h1>
+
+      {sessionExpired && (
+        <p style={{ color: "#b45309", background: "#fef3c7", padding: "0.75rem", borderRadius: "6px" }}>
+          Your session expired. Please log in again.
+        </p>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
