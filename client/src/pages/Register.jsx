@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { parseError } from "../utils/errorParser.js";
+import { parseError } from "../utils/parseError.js";
 
 function Register() {
   const {

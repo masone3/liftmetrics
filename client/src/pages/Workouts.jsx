@@ -2,16 +2,19 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useFetch } from "../hooks/useFetch.js";
 import { workoutsApi } from "../api/workouts.js";
+import { useToast } from "../context/useToast.js";
 import Skeleton from "../components/Skeleton.jsx";
 import WorkoutForm from "../components/WorkoutForm.jsx";
 
 function Workouts() {
   const { data: workouts, loading, error, refetch } = useFetch(() => workoutsApi.list(), []);
   const [showForm, setShowForm] = useState(false);
+  const { showToast } = useToast();
 
   const handleCreated = () => {
     setShowForm(false);
     refetch(); // pull the fresh list after creating
+    showToast("Workout created successfully!", "success");
   };
 
   return (

@@ -2,11 +2,14 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { useFetch } from "../hooks/useFetch.js";
 import { workoutLogsApi } from "../api/workoutLogs.js";
+import { parseError } from "../utils/parseError.js";
+import { useToast } from "../context/useToast.js";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import Skeleton from "../components/Skeleton.jsx";
 
 function History() {
   const [from, setFrom] = useState("");
+  const { showToast } = useToast();
   const [to, setTo] = useState("");
   const [confirmDeleteLog, setConfirmDeleteLog] = useState(null);
 
@@ -23,8 +26,10 @@ function History() {
       await workoutLogsApi.delete(logId);
       setConfirmDeleteLog(null);
       refetch();
+      showToast("Logged session deleted successfully!", "success");
     } catch (err) {
       console.error("Failed to delete log:", err);
+      showToast(parseError(err, "Failed to delete log"), "error");
     }
   };
 

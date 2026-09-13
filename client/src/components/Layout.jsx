@@ -1,8 +1,11 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth.js";
+import { useToast } from "../context/useToast.js";
+import Toast from "./Toast.jsx";
 
 function Layout() {
   const { isAuthenticated, user, logout } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -32,6 +35,7 @@ function Layout() {
       <main style={{ padding: "2rem" }}>
         <Outlet />
       </main>
+      <Toast toast={toast} />
     </div>
   );
 }

@@ -3,13 +3,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useFetch } from "../hooks/useFetch.js";
 import { workoutsApi } from "../api/workouts.js";
-import { parseError } from "../utils/errorParser.js";
+import { parseError } from "../utils/parseError.js";
+import { useToast } from "../context/useToast.js";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import LogSessionForm from "../components/LogSessionForm.jsx";
 import Skeleton from "../components/Skeleton.jsx";
 
 function WorkoutDetail() {
   const { id } = useParams();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const { data: workout, loading, error, refetch } = useFetch(() => workoutsApi.getById(id), [id]);
   const [showAddExercise, setShowAddExercise] = useState(false);
@@ -21,8 +23,10 @@ function WorkoutDetail() {
     try {
       await workoutsApi.delete(id);
       navigate("/workouts");
+      showToast("Workout deleted successfully!", "success");
     } catch (err) {
       console.error("Failed to delete workout:", err);
+      showToast(parseError(err, "Failed to delete workout"), "error");
     }
   };
 
@@ -31,8 +35,10 @@ function WorkoutDetail() {
       await workoutsApi.deleteExercise(id, exerciseId);
       setConfirmDeleteExercise(null);
       refetch();
+      showToast("Exercise removed successfully!", "success");
     } catch (err) {
-      console.error("Failed to delete exercise:", err);
+      console.error("Failed to remove exercise:", err);
+      showToast(parseError(err, "Failed to remove exercise"), "error");
     }
   };
 
@@ -115,6 +121,7 @@ function WorkoutDetail() {
             setShowAddExercise(false);
             refetch();
           }}
+          showToast={showToast}
         />
       )}
 
@@ -159,7 +166,7 @@ function WorkoutDetail() {
   );
 }
 
-function AddExerciseForm({ workoutId, onAdded }) {
+function AddExerciseForm({ workoutId, onAdded, showToast }) {
   const {
     register,
     handleSubmit,
@@ -174,6 +181,7 @@ function AddExerciseForm({ workoutId, onAdded }) {
       await workoutsApi.addExercise(workoutId, data);
       reset();
       onAdded();
+      showToast("Exercise added successfully!", "success");
     } catch (err) {
       console.error("Failed to add exercise:", err);
       setServerError(parseError(err, "Failed to add exercise"));

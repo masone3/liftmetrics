@@ -1,7 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import { workoutsApi } from "../api/workouts.js";
-import { parseError } from "../utils/errorParser.js";
+import { parseError } from "../utils/parseError.js";
 
 function WorkoutForm({ onCreated }) {
   const {

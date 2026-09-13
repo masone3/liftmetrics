@@ -2,7 +2,8 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import dayjs from "dayjs";
 import { workoutLogsApi } from "../api/workoutLogs.js";
-import { parseError } from "../utils/errorParser.js";
+import { parseError } from "../utils/parseError.js";
+import { useToast } from "../context/useToast.js";
 
 function LogSessionForm({ workout, onLogged }) {
   const {
@@ -24,6 +25,7 @@ function LogSessionForm({ workout, onLogged }) {
 
   const { fields, append, remove } = useFieldArray({ control, name: "sets" });
   const [serverError, setServerError] = useState(null);
+  const { showToast } = useToast();
 
   const onSubmit = async (data) => {
     setServerError(null);
@@ -40,6 +42,7 @@ function LogSessionForm({ workout, onLogged }) {
       };
       await workoutLogsApi.create(payload);
       onLogged();
+      showToast("Workout session logged successfully!", "success");
     } catch (err) {
       console.error("Failed to log session:", err);
       setServerError(parseError(err, "Failed to log session"));
