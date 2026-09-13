@@ -2,6 +2,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import dayjs from "dayjs";
 import { workoutLogsApi } from "../api/workoutLogs.js";
+import { parseError } from "../utils/errorParser.js";
 
 function LogSessionForm({ workout, onLogged }) {
   const {
@@ -41,10 +42,7 @@ function LogSessionForm({ workout, onLogged }) {
       onLogged();
     } catch (err) {
       console.error("Failed to log session:", err);
-      const message = Array.isArray(err.body?.error)
-        ? err.body.error.map((issue) => issue.message).join(", ")
-        : err.body?.error || "Failed to log session";
-      setServerError(message);
+      setServerError(parseError(err, "Failed to log session"));
     }
   };
 

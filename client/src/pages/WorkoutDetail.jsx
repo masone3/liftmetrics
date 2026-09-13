@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useFetch } from "../hooks/useFetch.js";
 import { workoutsApi } from "../api/workouts.js";
+import { parseError } from "../utils/errorParser.js";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import LogSessionForm from "../components/LogSessionForm.jsx";
 import Skeleton from "../components/Skeleton.jsx";
@@ -175,7 +176,7 @@ function AddExerciseForm({ workoutId, onAdded }) {
       onAdded();
     } catch (err) {
       console.error("Failed to add exercise:", err);
-      setServerError(err.body?.error || "Failed to add exercise");
+      setServerError(parseError(err, "Failed to add exercise"));
     }
   };
 

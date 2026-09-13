@@ -1,6 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { useState } from "react";
 import { workoutsApi } from "../api/workouts.js";
+import { parseError } from "../utils/errorParser.js";
 
 function WorkoutForm({ onCreated }) {
   const {
@@ -33,12 +34,7 @@ function WorkoutForm({ onCreated }) {
       onCreated();
     } catch (err) {
       console.error("Failed to create workout:", err);
-
-      const message = Array.isArray(err.body?.error)
-        ? err.body.error.map((issue) => issue.message).join(", ")
-        : err.body?.error || "Failed to create workout";
-
-      setServerError(message);
+      setServerError(parseError(err, "Failed to create workout"));
     }
   };
 

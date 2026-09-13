@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { parseError } from "../utils/errorParser.js";
 
 function Register() {
   const {
@@ -23,12 +24,13 @@ function Register() {
       const body = await res.json();
 
       if (!res.ok) {
-        setServerError(body.error?.[0]?.message || body.error || "Registration failed");
+        setServerError(parseError({ body }, "Login failed")); // or "Registration failed"
         return;
       }
 
       navigate("/login");
     } catch (err) {
+      console.error("Registration failed:", err);
       setServerError("Something went wrong. Please try again.");
     }
   };
