@@ -1,30 +1,29 @@
 import { useFetch } from "../hooks/useFetch.js";
-import { workoutsApi } from "../api/workouts.js";
+import { statsApi } from "../api/stats.js";
 import Skeleton from "../components/Skeleton.jsx";
+import VolumeChart from "../components/VolumeChart.jsx";
 
 function Dashboard() {
-  const { data: workouts, loading, error } = useFetch(() => workoutsApi.list(), []);
+  const { data: summary, loading: summaryLoading, error: summaryError } = useFetch(() => statsApi.summary(), []);
+  const { data: volumeData, loading: volumeLoading, error: volumeError } = useFetch(() => statsApi.volume(), []);
 
-  if (loading) {
+  if (summaryLoading || volumeLoading) {
     return (
       <div>
         <h1>Dashboard</h1>
         <Skeleton height="2rem" width="200px" />
         <div style={{ marginTop: "1rem" }}>
-          <Skeleton height="1.5rem" width="100%" />
-          <div style={{ marginTop: "0.5rem" }}>
-            <Skeleton height="1.5rem" width="100%" />
-          </div>
+          <Skeleton height="300px" />
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (summaryError || volumeError) {
     return (
       <div>
         <h1>Dashboard</h1>
-        <p style={{ color: "red" }}>Failed to load your workouts: {error.body?.error || error.message}</p>
+        <p style={{ color: "red" }}>Failed to load dashboard data.</p>
       </div>
     );
   }
@@ -32,7 +31,31 @@ function Dashboard() {
   return (
     <div>
       <h1>Dashboard</h1>
-      <p>You have {workouts.length} workout{workouts.length !== 1 ? "s" : ""}.</p>
+
+      <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
+        <StatCard label="Workouts" value={summary.workoutCount} />
+        <StatCard label="Sessions Logged" value={summary.totalSessionsLogged} />
+        <StatCard
+          label="Last Session"
+          value={summary.lastSessionDate ? new Date(summary.lastSessionDate).toLocaleDateString() : "—"}
+        />
+      </div>
+
+      <h2 style={{ marginTop: "2rem" }}>Training Volume Over Time</h2>
+      {volumeData.length === 0 ? (
+        <p>Log a few sessions to see your progress here.</p>
+      ) : (
+        <VolumeChart data={volumeData} />
+      )}
+    </div>
+  );
+}
+
+function StatCard({ label, value }) {
+  return (
+    <div style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "1rem", minWidth: "140px" }}>
+      <div style={{ color: "#666", fontSize: "0.85rem" }}>{label}</div>
+      <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{value}</div>
     </div>
   );
 }
