@@ -7,6 +7,7 @@ import userRoutes from "./routes/users.routes.js";
 import workoutsRoutes from "./routes/workouts.routes.js";
 import workoutLogsRoutes from "./routes/workoutLogs.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import statsRoutes from "./routes/stats.routes.js";
 import { notFound } from "./middleware/notFound.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -21,7 +22,7 @@ app.use("/health", healthRoutes);
 app.use("/users", userRoutes);
 app.use("/workouts", workoutsRoutes);
 app.use("/workout-logs", workoutLogsRoutes);
-
+app.use("/stats", statsRoutes);
 // Catch-all for unknown routes
 app.use(notFound);
 
