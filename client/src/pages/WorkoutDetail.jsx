@@ -5,6 +5,8 @@ import { useFetch } from "../hooks/useFetch.js";
 import { workoutsApi } from "../api/workouts.js";
 import { parseError } from "../utils/parseError.js";
 import { useToast } from "../context/useToast.js";
+import { statsApi } from "../api/stats.js";
+import ExerciseProgressChart from "../components/ExerciseProgressChart.jsx";
 import ConfirmDialog from "../components/ConfirmDialog.jsx";
 import LogSessionForm from "../components/LogSessionForm.jsx";
 import Skeleton from "../components/Skeleton.jsx";
@@ -18,6 +20,7 @@ function WorkoutDetail() {
   const [showLogSession, setShowLogSession] = useState(false);
   const [confirmDeleteWorkout, setConfirmDeleteWorkout] = useState(false);
   const [confirmDeleteExercise, setConfirmDeleteExercise] = useState(null);
+  const [expandedExercise, setExpandedExercise] = useState(null);
 
   const handleDeleteWorkout = async () => {
     try {
@@ -135,21 +138,24 @@ function WorkoutDetail() {
             .map((exercise) => (
               <li
                 key={exercise.id}
-                style={{
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  padding: "0.75rem",
-                  marginBottom: "0.5rem",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
+                style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "0.75rem", marginBottom: "0.5rem" }}
               >
-                <span>
-                  <strong>{exercise.name}</strong>
-                  {exercise.targetMuscle && <span style={{ color: "#666" }}> — {exercise.targetMuscle}</span>}
-                </span>
-                <button onClick={() => setConfirmDeleteExercise(exercise.id)}>Remove</button>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span
+                    onClick={() => setExpandedExercise(expandedExercise === exercise.id ? null : exercise.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <strong>{exercise.name}</strong>
+                    {exercise.targetMuscle && <span style={{ color: "#666" }}> — {exercise.targetMuscle}</span>}
+                    <span style={{ marginLeft: "0.5rem", color: "#1971c2" }}>
+                      {expandedExercise === exercise.id ? "▲ Hide progress" : "▼ Show progress"}
+                    </span>
+                  </span>
+                  <button onClick={() => setConfirmDeleteExercise(exercise.id)}>Remove</button>
+                </div>
+                {expandedExercise === exercise.id && (
+                  <ExerciseProgress exerciseId={exercise.id} exerciseName={exercise.name} />
+                )}
               </li>
             ))}
         </ul>
@@ -188,6 +194,8 @@ function AddExerciseForm({ workoutId, onAdded, showToast }) {
     }
   };
 
+  // ExerciseProgress REMOVED from here
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -203,6 +211,22 @@ function AddExerciseForm({ workoutId, onAdded, showToast }) {
       </button>
       {serverError && <p style={{ color: "red" }}>{serverError}</p>}
     </form>
+  );
+}
+
+function ExerciseProgress({ exerciseId, exerciseName }) {
+  const { data, loading, error } = useFetch(() => statsApi.exerciseProgress(exerciseId), [exerciseId]);
+
+  if (loading) return <p style={{ fontSize: "0.85rem", color: "#666" }}>Loading progress...</p>;
+  if (error) return <p style={{ fontSize: "0.85rem", color: "red" }}>Couldn't load progress data.</p>;
+  if (data.length < 2) {
+    return <p style={{ fontSize: "0.85rem", color: "#666" }}>Log this exercise a few more times to see a trend.</p>;
+  }
+
+  return (
+    <div style={{ marginTop: "0.75rem" }}>
+      <ExerciseProgressChart data={data} exerciseName={exerciseName} />
+    </div>
   );
 }
 
