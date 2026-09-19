@@ -57,7 +57,7 @@ function WorkoutForm({ onCreated }) {
       <div style={{ marginTop: "1rem" }}>
         <label>Exercises</label>
         {fields.map((field, index) => (
-          <div key={field.id} style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+          <div key={field.id} className="form-row" style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
             <input
               placeholder="Exercise name"
               {...register(`exercises.${index}.name`)}

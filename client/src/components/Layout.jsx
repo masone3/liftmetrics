@@ -15,7 +15,7 @@ function Layout() {
 
   return (
     <div>
-      <nav style={{ display: "flex", gap: "1rem", padding: "1rem", borderBottom: "1px solid #ddd" }}>
+      <nav className="nav-links" style={{ display: "flex", gap: "1rem", padding: "1rem", borderBottom: "1px solid #ddd" }}>
         <Link to="/">Home</Link>
         {isAuthenticated ? (
           <>

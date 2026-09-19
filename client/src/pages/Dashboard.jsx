@@ -32,7 +32,7 @@ function Dashboard() {
     <div>
       <h1>Dashboard</h1>
 
-      <div style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
+      <div className="stat-cards" style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
         <StatCard label="Workouts" value={summary.workoutCount} />
         <StatCard label="Sessions Logged" value={summary.totalSessionsLogged} />
         <StatCard

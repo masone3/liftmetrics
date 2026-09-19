@@ -67,7 +67,7 @@ function LogSessionForm({ workout, onLogged }) {
       <div style={{ marginTop: "1rem" }}>
         <label>Sets</label>
         {fields.map((field, index) => (
-          <div key={field.id} style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.5rem" }}>
+          <div key={field.id} className="form-row" style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.5rem" }}>
             <span style={{ minWidth: "120px" }}>{field.exerciseName}</span>
             <input
               type="number"
