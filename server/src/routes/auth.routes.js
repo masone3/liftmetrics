@@ -2,6 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import prisma from "../lib/prisma.js";
+import { authLimiter } from "../middleware/rateLimiters.js";
 
 import jwt from "jsonwebtoken";
 
@@ -16,7 +17,7 @@ const registerSchema = z.object({
 });
 
 // POST /auth/register
-router.post("/register", async (req, res, next) => {
+router.post("/register", authLimiter, async (req, res, next) => {
   try {
     const data = registerSchema.parse(req.body);
 
@@ -49,7 +50,7 @@ const loginSchema = z.object({
 });
 
 // POST /auth/login
-router.post("/login", async (req, res, next) => {
+router.post("/login", authLimiter, async (req, res, next) => {
   try {
     const data = loginSchema.parse(req.body);
 
