@@ -35,19 +35,20 @@ function History() {
 
   return (
     <div>
-      <h1>Workout History</h1>
+      <h1>Workout history</h1>
+      <p className="muted" style={{ marginBottom: "1.5rem" }}>Everything you've logged.</p>
 
-      <div style={{ display: "flex", gap: "1rem", marginTop: "1rem", alignItems: "flex-end" }}>
-        <div>
+      <div className="form-row" style={{ display: "flex", gap: "1rem", alignItems: "flex-end" }}>
+        <div className="field" style={{ marginTop: 0 }}>
           <label htmlFor="from">From</label>
           <input id="from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
         </div>
-        <div>
+        <div className="field" style={{ marginTop: 0 }}>
           <label htmlFor="to">To</label>
           <input id="to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
         </div>
         {(from || to) && (
-          <button onClick={() => { setFrom(""); setTo(""); }}>
+          <button className="btn-ghost" onClick={() => { setFrom(""); setTo(""); }}>
             Clear filters
           </button>
         )}
@@ -55,47 +56,42 @@ function History() {
 
       {loading && (
         <div style={{ marginTop: "1.5rem" }}>
-          <Skeleton height="5rem" />
+          <Skeleton height="4rem" />
           <div style={{ marginTop: "0.75rem" }}>
-            <Skeleton height="5rem" />
+            <Skeleton height="4rem" />
           </div>
         </div>
       )}
 
-      {error && (
-        <p style={{ color: "red", marginTop: "1rem" }}>
-          Failed to load history: {error.body?.error || error.message}
-        </p>
-      )}
+      {error && <p className="error-text" style={{ marginTop: "1rem" }}>{parseError(error, "Failed to load history")}</p>}
 
       {!loading && !error && logs.length === 0 && (
-        <p style={{ marginTop: "1.5rem" }}>No sessions logged in this range.</p>
+        <p className="muted" style={{ marginTop: "1.5rem" }}>No sessions logged in this range.</p>
       )}
 
       {!loading && !error && logs.length > 0 && (
-        <ul style={{ listStyle: "none", padding: 0, marginTop: "1.5rem" }}>
+        <div style={{ marginTop: "1.5rem" }}>
           {logs.map((log) => (
-            <li
-              key={log.id}
-              style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "1rem", marginBottom: "0.75rem" }}
-            >
+            <div key={log.id} className="list-row" style={{ flexDirection: "column", alignItems: "stretch" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <strong>{log.workout.name}</strong>
-                <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-                  <span style={{ color: "#666" }}>{dayjs(log.performedAt).format("MMM D, YYYY")}</span>
-                  <button onClick={() => setConfirmDeleteLog(log.id)}>Delete</button>
+                <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                  <span className="muted" style={{ fontSize: "0.85rem" }}>
+                    {dayjs(log.performedAt).format("MMM D, YYYY")}
+                  </span>
+                  <button className="btn-ghost" onClick={() => setConfirmDeleteLog(log.id)}>Delete</button>
                 </div>
               </div>
-              <ul style={{ marginTop: "0.5rem", paddingLeft: "1.25rem" }}>
+              <ul style={{ marginTop: "0.5rem", paddingLeft: "1.1rem", color: "var(--ink-muted)", fontSize: "0.9rem" }}>
                 {log.setEntries.map((set) => (
                   <li key={set.id}>
-                    {set.exercise.name}: {set.reps} reps @ {set.weight} lbs
+                    {set.exercise.name}: <span className="num">{set.reps} reps @ {set.weight} lbs</span>
                   </li>
                 ))}
               </ul>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
       {confirmDeleteLog && (

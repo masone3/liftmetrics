@@ -23,7 +23,7 @@ function Dashboard() {
     return (
       <div>
         <h1>Dashboard</h1>
-        <p style={{ color: "red" }}>Failed to load dashboard data.</p>
+        <p className="error-text">Failed to load dashboard data.</p>
       </div>
     );
   }
@@ -31,21 +31,24 @@ function Dashboard() {
   return (
     <div>
       <h1>Dashboard</h1>
+      <p className="muted" style={{ marginBottom: "1.5rem" }}>Your training at a glance.</p>
 
-      <div className="stat-cards" style={{ display: "flex", gap: "1.5rem", marginTop: "1rem" }}>
+      <div className="stat-cards" style={{ display: "flex", gap: "1rem" }}>
         <StatCard label="Workouts" value={summary.workoutCount} />
-        <StatCard label="Sessions Logged" value={summary.totalSessionsLogged} />
+        <StatCard label="Sessions logged" value={summary.totalSessionsLogged} />
         <StatCard
-          label="Last Session"
+          label="Last session"
           value={summary.lastSessionDate ? new Date(summary.lastSessionDate).toLocaleDateString() : "—"}
         />
       </div>
 
-      <h2 style={{ marginTop: "2rem" }}>Training Volume Over Time</h2>
+      <h2 style={{ marginTop: "2.5rem" }}>Training volume</h2>
       {volumeData.length === 0 ? (
-        <p>Log a few sessions to see your progress here.</p>
+        <p className="muted">Log a few sessions to see your progress here.</p>
       ) : (
-        <VolumeChart data={volumeData} />
+        <div className="panel">
+          <VolumeChart data={volumeData} />
+        </div>
       )}
     </div>
   );
@@ -53,9 +56,9 @@ function Dashboard() {
 
 function StatCard({ label, value }) {
   return (
-    <div style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "1rem", minWidth: "140px" }}>
-      <div style={{ color: "#666", fontSize: "0.85rem" }}>{label}</div>
-      <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{value}</div>
+    <div className="card" style={{ flex: 1, minWidth: "140px" }}>
+      <div className="muted" style={{ fontSize: "0.82rem", marginBottom: "0.4rem" }}>{label}</div>
+      <div className="num" style={{ fontSize: "1.75rem", fontWeight: 600 }}>{value}</div>
     </div>
   );
 }

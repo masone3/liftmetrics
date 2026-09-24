@@ -65,11 +65,11 @@ function WorkoutDetail() {
         ? "Workout not found."
         : error.status === 403
         ? "You don't have access to this workout."
-        : error.body?.error || "Failed to load workout.";
+        : parseError(error, "Failed to load workout");
 
     return (
       <div>
-        <p style={{ color: "red" }}>{message}</p>
+        <p className="error-text">{message}</p>
         <Link to="/workouts">← Back to workouts</Link>
       </div>
     );
@@ -77,16 +77,17 @@ function WorkoutDetail() {
 
   return (
     <div>
-      <Link to="/workouts">← Back to workouts</Link>
+      <Link to="/workouts" className="muted" style={{ fontSize: "0.85rem" }}>← Back to workouts</Link>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>{workout.name}</h1>
-        <button onClick={() => setConfirmDeleteWorkout(true)} style={{ color: "#d9534f" }}>
-          Delete Workout
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: "0.5rem" }}>
+        <div>
+          <h1>{workout.name}</h1>
+          {workout.description && <p className="muted">{workout.description}</p>}
+        </div>
+        <button className="btn-danger" onClick={() => setConfirmDeleteWorkout(true)}>
+          Delete workout
         </button>
       </div>
-
-      {workout.description && <p style={{ color: "#666" }}>{workout.description}</p>}
 
       {confirmDeleteWorkout && (
         <ConfirmDialog
@@ -97,23 +98,18 @@ function WorkoutDetail() {
       )}
 
       {workout.exercises.length > 0 && (
-        <div style={{ marginTop: "1rem" }}>
-          <button onClick={() => setShowLogSession((prev) => !prev)}>
-            {showLogSession ? "Cancel" : "Log a Session"}
+        <div style={{ marginTop: "1.5rem" }}>
+          <button className="btn-primary" onClick={() => setShowLogSession((prev) => !prev)}>
+            {showLogSession ? "Cancel" : "Log a session"}
           </button>
-          {showLogSession && (
-            <LogSessionForm
-              workout={workout}
-              onLogged={() => setShowLogSession(false)}
-            />
-          )}
+          {showLogSession && <LogSessionForm workout={workout} onLogged={() => setShowLogSession(false)} />}
         </div>
       )}
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5rem" }}>
-        <h2>Exercises</h2>
-        <button onClick={() => setShowAddExercise((prev) => !prev)}>
-          {showAddExercise ? "Cancel" : "+ Add Exercise"}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "2rem" }}>
+        <h2 style={{ marginBottom: 0 }}>Exercises</h2>
+        <button className="btn-ghost" onClick={() => setShowAddExercise((prev) => !prev)}>
+          {showAddExercise ? "Cancel" : "+ Add exercise"}
         </button>
       </div>
 
@@ -129,36 +125,35 @@ function WorkoutDetail() {
       )}
 
       {workout.exercises.length === 0 ? (
-        <p style={{ marginTop: "1rem" }}>No exercises yet — add one above.</p>
+        <p className="muted" style={{ marginTop: "1rem" }}>No exercises yet — add one above.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0, marginTop: "1rem" }}>
+        <div style={{ marginTop: "0.75rem" }}>
           {workout.exercises
             .slice()
             .sort((a, b) => a.order - b.order)
             .map((exercise) => (
-              <li
-                key={exercise.id}
-                style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "0.75rem", marginBottom: "0.5rem" }}
-              >
+              <div key={exercise.id} className="list-row" style={{ flexDirection: "column", alignItems: "stretch" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span
                     onClick={() => setExpandedExercise(expandedExercise === exercise.id ? null : exercise.id)}
                     style={{ cursor: "pointer" }}
                   >
                     <strong>{exercise.name}</strong>
-                    {exercise.targetMuscle && <span style={{ color: "#666" }}> — {exercise.targetMuscle}</span>}
-                    <span style={{ marginLeft: "0.5rem", color: "#1971c2" }}>
-                      {expandedExercise === exercise.id ? "▲ Hide progress" : "▼ Show progress"}
+                    {exercise.targetMuscle && <span className="muted"> — {exercise.targetMuscle}</span>}
+                    <span style={{ marginLeft: "0.5rem", color: "var(--accent)", fontSize: "0.85rem" }}>
+                      {expandedExercise === exercise.id ? "Hide progress" : "Show progress"}
                     </span>
                   </span>
-                  <button onClick={() => setConfirmDeleteExercise(exercise.id)}>Remove</button>
+                  <button className="btn-ghost" onClick={() => setConfirmDeleteExercise(exercise.id)}>
+                    Remove
+                  </button>
                 </div>
                 {expandedExercise === exercise.id && (
                   <ExerciseProgress exerciseId={exercise.id} exerciseName={exercise.name} />
                 )}
-              </li>
+              </div>
             ))}
-        </ul>
+        </div>
       )}
 
       {confirmDeleteExercise && (
@@ -194,22 +189,17 @@ function AddExerciseForm({ workoutId, onAdded, showToast }) {
     }
   };
 
-  // ExerciseProgress REMOVED from here
-
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{ display: "flex", gap: "0.5rem", marginTop: "1rem", alignItems: "flex-start" }}
-    >
-      <div>
+    <form onSubmit={handleSubmit(onSubmit)} className="panel form-row" style={{ display: "flex", gap: "0.5rem", alignItems: "flex-start" }}>
+      <div style={{ flex: 1 }}>
         <input placeholder="Exercise name" {...register("name", { required: "Required" })} />
-        {errors.name && <p style={{ color: "red", fontSize: "0.85rem" }}>{errors.name.message}</p>}
+        {errors.name && <p className="error-text">{errors.name.message}</p>}
       </div>
-      <input placeholder="Target muscle (optional)" {...register("targetMuscle")} />
-      <button type="submit" disabled={isSubmitting}>
+      <input placeholder="Target muscle (optional)" style={{ flex: 1 }} {...register("targetMuscle")} />
+      <button type="submit" className="btn-primary" disabled={isSubmitting}>
         {isSubmitting ? "Adding..." : "Add"}
       </button>
-      {serverError && <p style={{ color: "red" }}>{serverError}</p>}
+      {serverError && <p className="error-text">{serverError}</p>}
     </form>
   );
 }
@@ -217,14 +207,14 @@ function AddExerciseForm({ workoutId, onAdded, showToast }) {
 function ExerciseProgress({ exerciseId, exerciseName }) {
   const { data, loading, error } = useFetch(() => statsApi.exerciseProgress(exerciseId), [exerciseId]);
 
-  if (loading) return <p style={{ fontSize: "0.85rem", color: "#666" }}>Loading progress...</p>;
-  if (error) return <p style={{ fontSize: "0.85rem", color: "red" }}>Couldn't load progress data.</p>;
+  if (loading) return <p className="muted" style={{ fontSize: "0.85rem", marginTop: "0.5rem" }}>Loading progress...</p>;
+  if (error) return <p className="error-text" style={{ fontSize: "0.85rem", marginTop: "0.5rem" }}>Couldn't load progress data.</p>;
   if (data.length < 2) {
-    return <p style={{ fontSize: "0.85rem", color: "#666" }}>Log this exercise a few more times to see a trend.</p>;
+    return <p className="muted" style={{ fontSize: "0.85rem", marginTop: "0.5rem" }}>Log this exercise a few more times to see a trend.</p>;
   }
 
   return (
-    <div style={{ marginTop: "0.75rem" }}>
+    <div className="panel" style={{ marginTop: "0.75rem" }}>
       <ExerciseProgressChart data={data} exerciseName={exerciseName} />
     </div>
   );

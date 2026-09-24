@@ -39,49 +39,45 @@ function WorkoutForm({ onCreated }) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "1rem", marginTop: "1rem" }}
-    >
-      <div>
-        <label htmlFor="name">Workout Name</label>
+    <form onSubmit={handleSubmit(onSubmit)} className="panel">
+      <div className="field">
+        <label htmlFor="name">Workout name</label>
         <input id="name" {...register("name", { required: "Name is required" })} />
-        {errors.name && <p style={{ color: "red" }}>{errors.name.message}</p>}
+        {errors.name && <p className="error-text">{errors.name.message}</p>}
       </div>
 
-      <div style={{ marginTop: "0.75rem" }}>
+      <div className="field">
         <label htmlFor="description">Description (optional)</label>
         <input id="description" {...register("description")} />
       </div>
 
-      <div style={{ marginTop: "1rem" }}>
+      <div className="field">
         <label>Exercises</label>
         {fields.map((field, index) => (
           <div key={field.id} className="form-row" style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
-            <input
-              placeholder="Exercise name"
-              {...register(`exercises.${index}.name`)}
-            />
-            <input
-              placeholder="Target muscle (optional)"
-              {...register(`exercises.${index}.targetMuscle`)}
-            />
+            <input placeholder="Exercise name" {...register(`exercises.${index}.name`)} />
+            <input placeholder="Target muscle (optional)" {...register(`exercises.${index}.targetMuscle`)} />
             {fields.length > 1 && (
-              <button type="button" onClick={() => remove(index)}>
+              <button type="button" className="btn-ghost" onClick={() => remove(index)}>
                 Remove
               </button>
             )}
           </div>
         ))}
-        <button type="button" onClick={() => append({ name: "", targetMuscle: "" })} style={{ marginTop: "0.5rem" }}>
-          + Add Exercise
+        <button
+          type="button"
+          className="btn-ghost"
+          onClick={() => append({ name: "", targetMuscle: "" })}
+          style={{ marginTop: "0.5rem" }}
+        >
+          + Add exercise
         </button>
       </div>
 
-      {serverError && <p style={{ color: "red", marginTop: "0.75rem" }}>{serverError}</p>}
+      {serverError && <p className="error-text" style={{ marginTop: "0.75rem" }}>{serverError}</p>}
 
-      <button type="submit" disabled={isSubmitting} style={{ marginTop: "1rem" }}>
-        {isSubmitting ? "Creating..." : "Create Workout"}
+      <button type="submit" className="btn-primary" disabled={isSubmitting} style={{ marginTop: "1.5rem" }}>
+        {isSubmitting ? "Creating..." : "Create workout"}
       </button>
     </form>
   );

@@ -38,44 +38,37 @@ function Login() {
   };
 
   return (
-    <div style={{ maxWidth: "400px" }}>
-      <h1>Log In</h1>
+    <div style={{ maxWidth: "360px" }}>
+      <h1>Log in</h1>
+      <p className="muted" style={{ marginBottom: "1.5rem" }}>Welcome back.</p>
 
       {sessionExpired && (
-        <p style={{ color: "#b45309", background: "#fef3c7", padding: "0.75rem", borderRadius: "6px" }}>
+        <div className="panel" style={{ borderColor: "var(--danger)", background: "var(--danger-tint)", color: "var(--danger)", fontSize: "0.9rem" }}>
           Your session expired. Please log in again.
-        </p>
+        </div>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
+        <div className="field">
           <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            {...register("email", { required: "Email is required" })}
-          />
-          {errors.email && <p style={{ color: "red" }}>{errors.email.message}</p>}
+          <input id="email" type="email" {...register("email", { required: "Email is required" })} />
+          {errors.email && <p className="error-text">{errors.email.message}</p>}
         </div>
 
-        <div>
+        <div className="field">
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            {...register("password", { required: "Password is required" })}
-          />
-          {errors.password && <p style={{ color: "red" }}>{errors.password.message}</p>}
+          <input id="password" type="password" {...register("password", { required: "Password is required" })} />
+          {errors.password && <p className="error-text">{errors.password.message}</p>}
         </div>
 
-        {serverError && <p style={{ color: "red" }}>{serverError}</p>}
+        {serverError && <p className="error-text" style={{ marginTop: "0.75rem" }}>{serverError}</p>}
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Logging in..." : "Log In"}
+        <button type="submit" className="btn-primary" disabled={isSubmitting} style={{ width: "100%", marginTop: "1.5rem" }}>
+          {isSubmitting ? "Logging in..." : "Log in"}
         </button>
       </form>
 
-      <p>
+      <p className="muted" style={{ marginTop: "1.25rem", fontSize: "0.9rem" }}>
         Don't have an account? <Link to="/register">Register</Link>
       </p>
     </div>

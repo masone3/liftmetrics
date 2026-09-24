@@ -50,64 +50,38 @@ function LogSessionForm({ workout, onLogged }) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "1rem", marginTop: "1rem" }}
-    >
-      <div>
+    <form onSubmit={handleSubmit(onSubmit)} className="panel">
+      <div className="field">
         <label htmlFor="performedAt">Date</label>
-        <input
-          id="performedAt"
-          type="date"
-          {...register("performedAt", { required: "Date is required" })}
-        />
-        {errors.performedAt && <p style={{ color: "red" }}>{errors.performedAt.message}</p>}
+        <input id="performedAt" type="date" style={{ maxWidth: "220px" }} {...register("performedAt", { required: "Date is required" })} />
+        {errors.performedAt && <p className="error-text">{errors.performedAt.message}</p>}
       </div>
 
-      <div style={{ marginTop: "1rem" }}>
+      <div className="field">
         <label>Sets</label>
         {fields.map((field, index) => (
           <div key={field.id} className="form-row" style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginTop: "0.5rem" }}>
-            <span style={{ minWidth: "120px" }}>{field.exerciseName}</span>
-            <input
-              type="number"
-              placeholder="Reps"
-              style={{ width: "80px" }}
-              {...register(`sets.${index}.reps`, { required: true, min: 1 })}
-            />
-            <input
-              type="number"
-              step="0.5"
-              placeholder="Weight"
-              style={{ width: "80px" }}
-              {...register(`sets.${index}.weight`, { required: true, min: 0 })}
-            />
+            <span className="muted" style={{ minWidth: "120px", fontSize: "0.9rem" }}>{field.exerciseName}</span>
+            <input type="number" placeholder="Reps" className="num" style={{ width: "90px" }} {...register(`sets.${index}.reps`, { required: true, min: 1 })} />
+            <input type="number" step="0.5" placeholder="Weight" className="num" style={{ width: "90px" }} {...register(`sets.${index}.weight`, { required: true, min: 0 })} />
             <button
               type="button"
-              onClick={() =>
-                append({
-                  exerciseId: field.exerciseId,
-                  exerciseName: field.exerciseName,
-                  reps: "",
-                  weight: "",
-                })
-              }
+              className="btn-ghost"
+              onClick={() => append({ exerciseId: field.exerciseId, exerciseName: field.exerciseName, reps: "", weight: "" })}
             >
-              + Another set
+              + Set
             </button>
             {fields.length > workout.exercises.length && (
-              <button type="button" onClick={() => remove(index)}>
-                Remove
-              </button>
+              <button type="button" className="btn-ghost" onClick={() => remove(index)}>Remove</button>
             )}
           </div>
         ))}
       </div>
 
-      {serverError && <p style={{ color: "red", marginTop: "0.75rem" }}>{serverError}</p>}
+      {serverError && <p className="error-text" style={{ marginTop: "0.75rem" }}>{serverError}</p>}
 
-      <button type="submit" disabled={isSubmitting} style={{ marginTop: "1rem" }}>
-        {isSubmitting ? "Logging..." : "Log Session"}
+      <button type="submit" className="btn-primary" disabled={isSubmitting} style={{ marginTop: "1rem" }}>
+        {isSubmitting ? "Logging..." : "Log session"}
       </button>
     </form>
   );

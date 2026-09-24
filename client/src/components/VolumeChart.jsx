@@ -20,9 +20,9 @@ function VolumeChart({ data }) {
         <Line
           type="monotone"
           dataKey="volume"
-          stroke="#2f9e44"
+          stroke="#35524a"
           strokeWidth={2}
-          dot={{ r: 4 }}
+          dot={{ r: 4, fill: "#35524a" }}
         />
       </LineChart>
     </ResponsiveContainer>

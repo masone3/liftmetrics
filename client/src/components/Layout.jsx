@@ -15,24 +15,38 @@ function Layout() {
 
   return (
     <div>
-      <nav className="nav-links" style={{ display: "flex", gap: "1rem", padding: "1rem", borderBottom: "1px solid #ddd" }}>
-        <Link to="/">Home</Link>
-        {isAuthenticated ? (
-          <>
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/workouts">Workouts</Link>
-            <Link to="/history">History</Link>
-            <span>Hi, {user?.name}</span>
-            <button onClick={handleLogout}>Log out</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
-          </>
-        )}
+      <nav
+        className="nav-links"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "1.5rem",
+          padding: "1.25rem 1.5rem",
+          borderBottom: "1px solid var(--border)",
+          background: "var(--surface)",
+        }}
+      >
+        <Link to="/" style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: "var(--ink)" }}>
+          Liftmetrics
+        </Link>
+        <div style={{ display: "flex", gap: "1.25rem", marginLeft: "auto", alignItems: "center" }}>
+          {isAuthenticated ? (
+            <>
+              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/workouts">Workouts</Link>
+              <Link to="/history">History</Link>
+              <span className="muted" style={{ fontSize: "0.85rem" }}>{user?.name}</span>
+              <button className="btn-ghost" onClick={handleLogout}>Log out</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">Log in</Link>
+              <Link to="/register">Register</Link>
+            </>
+          )}
+        </div>
       </nav>
-      <main style={{ padding: "2rem" }}>
+      <main className="container" style={{ padding: "2.5rem 1.5rem" }}>
         <Outlet />
       </main>
       <Toast toast={toast} />
