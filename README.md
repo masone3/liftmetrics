@@ -2,7 +2,7 @@
  
 A full-stack workout planner SaaS app — plan workouts, log training sessions, and track progress over time with real data visualizations.
  
-**Live demo:** [https://liftmetrics.onrender.com](https://liftmetrics.onrender.com) *(replace with your actual frontend URL)*
+**Live demo:** [https://liftmetrics-app.onrender.com](https://liftmetrics.onrender.com) *(replace with your actual frontend URL)*
 **API:** [https://liftmetrics-api.onrender.com](https://liftmetrics-api.onrender.com) *(replace with your actual backend URL)*
  
 > Note: this project runs on Render's free tier, so the backend may take 30–60 seconds to "wake up" on the first request after a period of inactivity.
